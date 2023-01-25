@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Contacts from "./components/Contacts"
+import "./style.css"
 
-const App = (props) =>
+import axios from 'axios';
+
+const App = () =>
 {
 
-	const [contacts, setContacts] = useState(props.contacts)
+	const [contacts, setContacts] = useState([])
 
 	const [newContact, setNewContact] = useState('')
 	const [newNumber, setNewNumber] = useState('')
@@ -15,6 +18,17 @@ const App = (props) =>
 		name: newContact,
 		phone: newNumber,
 	}
+
+	const hook = () => {
+
+		axios.get('http://localhost:3001/persons')
+		.then(response => {
+			console.log('promise fulfilled')
+			setContacts(response.data);
+		})
+	}
+
+	useEffect(hook, []);
 
 
 	const addContact = (e) => {
@@ -51,16 +65,16 @@ const App = (props) =>
 
   return (
 
-    <div>
+    <div className="container">
 
 		<h2>Phonebook</h2>
-		Filter persons:{" "}
-			<input placeholder="search" type = "search" value={ search }
+		<div className="search">
+			<input className="input" placeholder="search" type = "search" value={ search }
 					onChange = { handleSearch }
 			></input>
-
+		</div>
 		<h2>Add Contact</h2>
-			<form onSubmit = { addContact }>
+			<form className="form" onSubmit = { addContact }>
 				<input placeholder="name" type = "text" value = { newContact }
 					onChange = { handleContactChange }
 				></input>
@@ -72,7 +86,7 @@ const App = (props) =>
 				<button type="submit">add a contact</button>
 			</form>
 
-		<h2>Numbers</h2>
+		<h2>Contacts</h2>
 			<ul style={ {listStyle: "none"} }>
         		{filtered.map(contact =>
 					<Contacts key={contact.name} contact={contact} />

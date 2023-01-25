@@ -1,9 +1,10 @@
+import "../style.css"
 
 const Contacts = ( {contact} ) => {
 
 	return (
 		<div>
-			<li> {contact.name} {contact.phone} </li>
+			<li className="list"> {contact.name} {contact.phone} </li>
 		</div>
 	)
 }
