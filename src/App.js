@@ -1,29 +1,26 @@
 import { useState, useEffect } from "react";
-import Contacts from "./components/Contacts"
-import "./style.css"
-
-import axios from 'axios';
+import Contacts from "./components/Contacts";
+import contactsData from './services/server';
+import './style.css'
 
 const App = () =>
 {
 
 	const [contacts, setContacts] = useState([])
-
 	const [newContact, setNewContact] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [search, setSearch] = useState('')
 
 	const newContactObj = {
-		id: contacts.length + 1,
+		//id: contacts.length + 1,
 		name: newContact,
 		phone: newNumber,
 	}
 
 	const hook = () => {
-
-		axios.get('http://localhost:3001/persons')
+		
+		contactsData.getAll()
 		.then(response => {
-			console.log('promise fulfilled')
 			setContacts(response.data);
 		})
 	}
@@ -38,9 +35,12 @@ const App = () =>
 			alert(`${newContact} is already in the phonebook `);
 			return;
 		}	
-
-		setContacts(contacts.concat(newContactObj))
-		setNewContact('')
+	
+		contactsData.create(newContactObj)
+			.then( response => {
+				setContacts(contacts.concat(response.data))
+				setNewContact('')
+		})
 	};
 
  	const handleContactChange = (e) =>
@@ -59,8 +59,8 @@ const App = () =>
 	};
 
 	const filtered = !search ? contacts  
-			: contacts.filter( contact => 
-				contact.name.toLowerCase().includes(search.toLocaleLowerCase())
+			: contacts.filter( person => 
+				person.name.toLowerCase().includes(search.toLocaleLowerCase())
 			);
 
   return (
@@ -88,12 +88,11 @@ const App = () =>
 
 		<h2>Contacts</h2>
 			<ul style={ {listStyle: "none"} }>
-        		{filtered.map(contact =>
-					<Contacts key={contact.name} contact={contact} />
+        		{filtered.map(p =>
+					<Contacts key={p.name} contact={p} />
 				)}
       		</ul>
 
-			
     </div>
 
   );
