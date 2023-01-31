@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import Contacts from "./components/Contacts";
-import contactsData from './services/server';
+/* import contactsData from './services/server';
+ */
 import './style.css'
+import axios from "axios";
+
 
 const App = () =>
 {
@@ -16,11 +19,13 @@ const App = () =>
 		name: newContact,
 		phone: newNumber,
 	}
+	const baseURL = 'http://localhost:3001/api/contacts';
 
 	const hook = () => {
 		
-		contactsData.getAll()
-		.then(response => {
+		//contactsData.getAll()
+		axios.get(baseURL)
+			.then(response => {
 			setContacts(response.data);
 		})
 	}
@@ -30,18 +35,26 @@ const App = () =>
 
 	const addContact = (e) => {
 		e.preventDefault();
-		if (contacts.findIndex((person) => person.name === newContact) !== -1) 
+		if (contacts.findIndex((f) => f.name === newContact) !== -1) 
 		{ 
 			alert(`${newContact} is already in the phonebook `);
 			return;
 		}	
 	
-		contactsData.create(newContactObj)
+		//contactsData.create(newContactObj)
+			axios.post(baseURL, newContactObj)
 			.then( response => {
 				setContacts(contacts.concat(response.data))
 				setNewContact('')
 		})
 	};
+
+	/* const removeId = (id) =>{
+		axios.delete(`http://localhost:3001/persons/${id}`)
+			.then(response => {
+				setContacts(contacts.concat(response.data))
+			})
+	} */
 
  	const handleContactChange = (e) =>
 	{
@@ -60,7 +73,7 @@ const App = () =>
 
 	const filtered = !search ? contacts  
 			: contacts.filter( person => 
-				person.name.toLowerCase().includes(search.toLocaleLowerCase())
+				person.name.toLowerCase().includes(search.toLowerCase())
 			);
 
   return (
@@ -87,12 +100,12 @@ const App = () =>
 			</form>
 
 		<h2>Contacts</h2>
-			<ul style={ {listStyle: "none"} }>
+		<ul style={ {listStyle: "none"} }>
         		{filtered.map(p =>
 					<Contacts key={p.name} contact={p} />
 				)}
       		</ul>
-
+		
     </div>
 
   );
